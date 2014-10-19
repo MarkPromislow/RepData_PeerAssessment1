@@ -6,26 +6,31 @@ output:
 ---
 
 ## Loading and preprocessing the data
-```{r, echo=FALSE}
+```{r, echo=TRUE}
 ##setwd("GitHub/RepData_PeerAssessment1")
 activityData <- read.csv("activity.csv", na.strings="NA")
-activityData$hour <- as.double(as.integer(activityData$interval / 100 )) + (activityData$interval %% 100) / 60
 activityData$date <- as.Date(activityData$date)
-#activityData$weekday <- weekdays(activityData$date)
+activityData$hour <- as.double(as.integer(activityData$interval / 100 )) + (activityData$interval %% 100) / 60
 ```
 
 ## What is mean total number of steps taken per day?
 1. Make a histogram of the total number of steps taken each day.
-```{r, echo=FALSE}
+```{r, echo=TRUE}
 totalPerDay <- aggregate(activityData$steps, by=list(activityData$date), FUN=sum)
 hist(totalPerDay$x, main = paste("Histogram of Number of Steps per Day"), xlab = "Number of Steps per Day")
 ```
+
 2. Calculate and report the mean and median total number of steps taken per day.
-```{r, echo=FALSE}
+```{r, echo=TRUE}
 meanPerDay <- aggregate(activityData$steps, by=list(activityData$date), FUN=mean)
 colnames(meanPerDay) = c("date", "mean")
 medianPerDay <- aggregate(activityData$steps, by=list(activityData$date), FUN=median)
 colnames(medianPerDay) = c("date", "median")
+
+# report the mean and median totla number of stesp taken per day
+stepsPerDay <- meanPerDay
+stepsPerDay$median <- medianPerDay$median
+stepsPerDay
 
 plot(meanPerDay$date, meanPerDay$mean, type = "s", xlab = "date", ylab = "steps", col='blue')
 lines(medianPerDay$date, medianPerDay$median, type = "s", col = "green")
@@ -34,14 +39,14 @@ legend("top", legend = c("mean", "median"), bty = "n", lty = 1, col = c("blue", 
 
 ## What is the average daily activity pattern?
 1. Make a time series plot (i.e. type = "s") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
-```{r, echo=FALSE}
+```{r, echo=TRUE}
 activity <- activityData[! is.na(activityData$steps),]
 meanPerInterval <- aggregate(activity$steps, by=list(activity$hour), FUN = mean)
 colnames(meanPerInterval) = c("hour", "steps")
 plot(meanPerInterval$hour, meanPerInterval$steps, type = "s", main = "Average Steps per Interval", xlab = "hour", ylab = "steps per 5 minute interval")
 ```
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
-```{r, echo=FALSE}
+```{r, echo=TRUE}
 maxSteps <- meanPerInterval[meanPerInterval$steps == max(meanPerInterval$steps), c("steps", "hour")]
 maxStepsTime <- sprintf("%02d:%02d", as.integer(maxSteps$hour), as.integer((maxSteps$hour %% 1) * 60))
 ```
@@ -50,7 +55,7 @@ is `r sprintf("%0.2f", maxSteps$steps)` steps at `r maxStepsTime`.
 
 ## Imputing missing values
 1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
-```{r, echo=FALSE}
+```{r, echo=TRUE}
 missingValues <- sum(is.na(activityData$steps))
 ```
 There are `r missingValues` missing values in the dataset.
@@ -64,7 +69,7 @@ Missing values will be filled in with the mean steps for the 5-minute interval a
 * These values will be used to replace the NA values in the new dataset.
 
 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
-``` {r, echo=FALSE}
+``` {r, echo=TRUE}
 dayType <- function(date) {
     weekday <- weekdays(date)
     if (weekday == "Saturday" || weekday == "Sunday") {
@@ -97,7 +102,7 @@ for(row in 1:rowCnt) {
 
 4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
-```{r, echo=FALSE}
+```{r, echo=TRUE}
 newTotalPerDay <- aggregate(newActivity$steps, by=list(newActivity$date), FUN=sum)
 hist(newTotalPerDay$x, main = paste("Histogram of Number of Steps per Day"), xlab = "Number of Steps per Day")
 
@@ -106,9 +111,14 @@ colnames(newMeanPerDay) = c("date", "mean")
 newMedianPerDay <- aggregate(newActivity$steps, by=list(newActivity$date), FUN=median)
 colnames(newMedianPerDay) = c("date", "median")
 
+# report the mean and median totla number of stesp taken per day
+stepsPerDay <- meanPerDay
+stepsPerDay$median <- medianPerDay$median
+stepsPerDay
+
 plot(newMeanPerDay$date, newMeanPerDay$mean, type = "s", xlab = "date", ylab = "steps", col="blue")
 lines(newMedianPerDay$date, newMedianPerDay$median, type = "s", col = "green")
-legend("top", legend = c("mean", "original mean", "median"), bty = "n", lty = 1, col = c("blue", "green"))
+legend("top", legend = c("mean", "median"), bty = "n", lty = 1, col = c("blue", "green"))
 ```
 
 The shape of the histagram has not changed.  The only difference is more data points.
@@ -118,16 +128,26 @@ The average number of steps per day has not changed, other then missing values a
 The median number of steps is now much larger for days that were missing steps.  This is because the average values used are genearlly greater than the median.  A better way to impute the missing values would have been to take a random sample of the non-na values for the same interval and day type.
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r, echo=FALSE}
+```{r, echo=TRUE}
 weekdayActivity <- newActivity[newActivity$daytype == "weekday",]
 weekdayMeanPerInterval <- aggregate(weekdayActivity$steps, by=list(weekdayActivity$hour), FUN = mean)
 colnames(weekdayMeanPerInterval) = c("hour", "steps")
 weekendActivity <- newActivity[newActivity$daytype == "weekend",]
 weekendMeanPerInterval <- aggregate(weekendActivity$steps, by=list(weekendActivity$hour), FUN = mean)
 colnames(weekendMeanPerInterval) = c("hour", "steps")
-plot(weekdayMeanPerInterval$hour, weekdayMeanPerInterval$steps, type="s", main = "Average Steps per Interval", xlab = "hour", ylab = "steps per 5 minute interval", col="blue")
+```
+```{r}
+plot(weekdayMeanPerInterval$hour, weekdayMeanPerInterval$steps, type="s", main = "Average Steps per 5 Minute Interval", xlab = "hour", ylab = "steps per 5 minute interval", col="blue")
 lines(weekendMeanPerInterval$hour, weekendMeanPerInterval$steps, type="s", col="green")
 legend("topright", legend = c("weekday", "weekend"), bty = "n", lty = 1, col = c("blue", "green"))
+```
+```{r}
+library(ggplot2)
+weekdayMeanPerInterval$daytype = "weekday"
+weekendMeanPerInterval$daytype = "weekend"
+meanPerInterval <- rbind(weekdayMeanPerInterval, weekendMeanPerInterval)
+str(meanPerInterval)
+qplot(hour, steps, data = meanPerInterval, geom = "line", main = "Average Steps per 5 Minute Interval", facets = daytype ~ .)
 ```
 
 The activity patterns between weekdays and weekends are different.
