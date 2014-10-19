@@ -99,7 +99,8 @@ stepsPerDay
 ```
 
 ```r
-plot(meanPerDay$date, meanPerDay$mean, type = "s", xlab = "date", ylab = "steps", col='blue')
+plot(meanPerDay$date, meanPerDay$mean, type = "s",
+     main = "Steps per 5 Minute Interval", xlab = "date", ylab = "steps", col='blue')
 lines(medianPerDay$date, medianPerDay$median, type = "s", col = "green")
 legend("top", legend = c("mean", "median"), bty = "n", lty = 1, col = c("blue", "green"))
 ```
@@ -113,17 +114,20 @@ legend("top", legend = c("mean", "median"), bty = "n", lty = 1, col = c("blue", 
 activity <- activityData[! is.na(activityData$steps),]
 meanPerInterval <- aggregate(activity$steps, by=list(activity$hour), FUN = mean)
 colnames(meanPerInterval) = c("hour", "steps")
-plot(meanPerInterval$hour, meanPerInterval$steps, type = "s", main = "Average Steps per Interval", xlab = "hour", ylab = "steps per 5 minute interval")
+plot(meanPerInterval$hour, meanPerInterval$steps, type = "s",
+     main = "Average Steps per 5 Minute Interval", xlab = "hour", ylab = "steps per 5 minute interval")
 ```
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 ```r
 maxSteps <- meanPerInterval[meanPerInterval$steps == max(meanPerInterval$steps), c("steps", "hour")]
 maxStepsTime <- sprintf("%02d:%02d", as.integer(maxSteps$hour), as.integer((maxSteps$hour %% 1) * 60))
 ```
-The max number of steps per 5 minute interval\, averaged across all of the days in the dataset\,
+
+The max number of steps per 5 minute interval, averaged across all of the days in the dataset,
 is 206.17 steps at 08:35.
 
 ## Imputing missing values
@@ -132,6 +136,7 @@ is 206.17 steps at 08:35.
 ```r
 missingValues <- sum(is.na(activityData$steps))
 ```
+
 There are 2304 missing values in the dataset.
 
 2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
@@ -263,7 +268,8 @@ stepsPerDay
 ```
 
 ```r
-plot(newMeanPerDay$date, newMeanPerDay$mean, type = "s", xlab = "date", ylab = "steps", col="blue")
+plot(newMeanPerDay$date, newMeanPerDay$mean, type = "s",
+     main = "Average Steps per 5 Minute Interval", xlab = "date", ylab = "steps", col="blue")
 lines(newMedianPerDay$date, newMedianPerDay$median, type = "s", col = "green")
 legend("top", legend = c("mean", "median"), bty = "n", lty = 1, col = c("blue", "green"))
 ```
@@ -288,7 +294,8 @@ colnames(weekendMeanPerInterval) = c("hour", "steps")
 ```
 
 ```r
-plot(weekdayMeanPerInterval$hour, weekdayMeanPerInterval$steps, type="s", main = "Average Steps per 5 Minute Interval", xlab = "hour", ylab = "steps per 5 minute interval", col="blue")
+plot(weekdayMeanPerInterval$hour, weekdayMeanPerInterval$steps, type="s",
+     main = "Average Steps per 5 Minute Interval", xlab = "hour", ylab = "steps per 5 minute interval", col="blue")
 lines(weekendMeanPerInterval$hour, weekendMeanPerInterval$steps, type="s", col="green")
 legend("topright", legend = c("weekday", "weekend"), bty = "n", lty = 1, col = c("blue", "green"))
 ```
@@ -311,7 +318,8 @@ str(meanPerInterval)
 ```
 
 ```r
-qplot(hour, steps, data = meanPerInterval, geom = "line", main = "Average Steps per 5 Minute Interval", facets = daytype ~ .)
+qplot(hour, steps, data = meanPerInterval, geom = "line",
+      main = "Average Steps per 5 Minute Interval", facets = daytype ~ .)
 ```
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-11-1.png) 
